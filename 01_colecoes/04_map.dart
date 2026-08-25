@@ -20,7 +20,7 @@ void main(List<String> args) {
     ],
   };
   print(escola);
-  print("Escola: ${escola['nome']}");
+  print("escola: ${escola['nome']}");
   for (var curso in escola["cursos"] as List) {
     print("- ${curso["nome"]} -${curso["descricao"]}");
   }
