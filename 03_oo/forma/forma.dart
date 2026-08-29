@@ -22,6 +22,8 @@ abstract class Forma {
     //   print("${tipoForma!.name} com área de ${calculaArea()}");
     // }
 
-    print("${tipoForma!.name} com área de ${calculaArea()}");
+    print(
+      "${tipoForma!.name} - ${tipoForma.index} com área de ${calculaArea()}",
+    );
   }
 }

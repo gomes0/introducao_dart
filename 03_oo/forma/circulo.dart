@@ -1,19 +1,20 @@
 import 'forma.dart';
 import 'enum.dart';
+import 'dart:math';
 
 //Herança / Especialização
 //Classe Quadrado herda os membros (variáveis e métodos) de Forma
-class Quadrado extends Forma {
-  //Variavel
-  double lado;
+class Circulo extends Forma {
+  //Variaveis
+  double raio;
 
   //Construtor da Classe Quadrado
   //Chamando o construtor da classe pai
-  Quadrado(this.lado) : super(tpForma.Quadrado);
+  Circulo(this.raio) : super(tpForma.Retangulo);
 
   //Sobrescrever o método abstrato da classe pai
   @override
   double calculaArea() {
-    return lado * lado;
+    return pi * raio * raio;
   }
 }
