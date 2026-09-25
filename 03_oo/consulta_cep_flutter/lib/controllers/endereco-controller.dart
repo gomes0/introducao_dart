@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:consultacep/execeptions/api-invalida-exception.dart';
-import 'package:consultacep/execeptions/cep-invalido-exception.dart';
-import 'package:consultacep/execeptions/cep-nao-encontrado-exception.dart';
-import 'package:consultacep/models/endereco.dart';
-import 'package:consultacep/service/CEPService.dart';
+import '../execeptions/api-invalida-exception.dart';
+import '../execeptions/cep-invalido-exception.dart';
+import '../execeptions/cep-nao-encontrado-exception.dart';
+import '../models/endereco.dart';
+import '../service/CEPService.dart';
 import 'package:http/http.dart' as http;
 
 class EnderecoController {
