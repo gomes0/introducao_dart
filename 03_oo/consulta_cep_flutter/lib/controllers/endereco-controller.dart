@@ -1,36 +1,29 @@
-import 'dart:convert';
-import '../execeptions/api-invalida-exception.dart';
-import '../execeptions/cep-invalido-exception.dart';
-import '../execeptions/cep-nao-encontrado-exception.dart';
+import '../exceptions/api-invalida-exception.dart';
+import '../exceptions/cep-invalido-exception.dart';
+import '../exceptions/localizacao-nao-encontrada-exception.dart';
 import '../models/endereco.dart';
 import '../service/CEPService.dart';
-import 'package:http/http.dart' as http;
 
 class EnderecoController {
-  
-  CEPService cepService = CEPService();
+  final CEPService cepservice = CEPService();
 
   String validaCEP(String? cep) {
-    //Se o CEP digitado for nulo ou em branco, retorna uma exceção
-    if (cep == null || cep.isEmpty) {
-      //throw Exception('CEP Invalido!!! Tente Novamene...');
+    if (cep == null || cep.trim().isEmpty) {
       throw CepInvalidoException();
-    } else {
-      //Retira todos os caracteres e letras, deixando apenas os números
-      cep = cep.replaceAll(RegExp(r'[^0-9]'), '');
-
-      //Se a quantidade de números for diferente de 8 retorna uma exeção
-      //Caso contrário retorna o CEP sem caracteres ou letras
-      if (cep.length != 8) {
-        //throw Exception('CEP Invalido, deve possuir 8 números');
-        throw CepInvalidoException();
-      } else {
-        return cep;
-      }
     }
+
+    // Remove qualquer caractere que NÃO seja um número de 0 a 9
+    String cepApenasNumeros = cep.replaceAll(RegExp(r'[^0-9]'), '');
+
+    // Se a quantidade de números for diferente de 8, lança exceção
+    if (cepApenasNumeros.length != 8) {
+      throw CepInvalidoException();
+    }
+
+    return cepApenasNumeros;
   }
 
   Future<Endereco> buscarEndereco(String cep) async {
-    return cepService.consultar(cep);
+    return cepservice.consultar(cep);
   }
 }

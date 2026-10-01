@@ -1,4 +1,3 @@
-//Classe Endereco que representa os dados de um endereço retornado pela API ViaCEP
 class Endereco {
   String cep;
   String logradouro;
@@ -13,7 +12,6 @@ class Endereco {
   String ddd;
   String siafi;
 
-  //Construtor da classe Endereco
   Endereco({
     required this.cep,
     required this.logradouro,
@@ -29,7 +27,6 @@ class Endereco {
     required this.siafi,
   });
 
-  //Método que converte o objeto Endereco para Json
   Map<String, dynamic> paraJson() {
     return {
       'cep': this.cep,
@@ -47,9 +44,8 @@ class Endereco {
     };
   }
 
-  //Metodo para transformar o JSon em um objeto Endereco
-  //factory (fábrica) é um especial de construtor que permite controlar qual instancia será retornada
-  factory Endereco.fromJson(Map<String, dynamic> json) {
+  //Método para tranformar o Json em um objeto endereço
+  factory Endereco.deJson(Map<String, dynamic> json) {
     return Endereco(
       cep: json['cep'],
       logradouro: json['logradouro'],

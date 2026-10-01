@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:consulta_cep_flutter/views/endereco-view.dart';
 
 void main() {
   runApp(const ConsultaCEPApp());
@@ -11,11 +12,25 @@ class ConsultaCEPApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        appBar: AppBar(title: const Text("Consulta CEP")),
-
-        body: const Center(child: Text("Meu Primeiro Aplicativo Flutter")),
+      title: 'Consulta CEP',
+      
+      // Configuração do Tema Moderno (Material 3)
+      theme: ThemeData(
+        useMaterial3: true,
+        colorSchemeSeed: Colors.deepPurple,
+        brightness: Brightness.light,
+        
+        // Estilização global para inputs e botões
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: Colors.white,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+        ),
       ),
+      
+      home: const EnderecoView(),
     );
   }
 }
