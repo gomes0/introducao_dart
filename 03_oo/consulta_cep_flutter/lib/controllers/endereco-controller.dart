@@ -1,3 +1,6 @@
+import '../models/localizacao.dart';
+import '../service/localizacaoService.dart';
+
 import '../exceptions/api-invalida-exception.dart';
 import '../exceptions/cep-invalido-exception.dart';
 import '../exceptions/localizacao-nao-encontrada-exception.dart';
@@ -6,6 +9,8 @@ import '../service/CEPService.dart';
 
 class EnderecoController {
   final CEPService cepservice = CEPService();
+
+  Localizacaoservice localizacaoservice = Localizacaoservice();
 
   String validaCEP(String? cep) {
     if (cep == null || cep.trim().isEmpty) {
@@ -25,5 +30,9 @@ class EnderecoController {
 
   Future<Endereco> buscarEndereco(String cep) async {
     return cepservice.consultar(cep);
+  }
+
+  Future<Localizacao> buscarLocalizacao(String cep) async {
+    return Localizacaoservice().consultar(cep);
   }
 }

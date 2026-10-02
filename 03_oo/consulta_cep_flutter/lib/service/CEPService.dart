@@ -1,5 +1,5 @@
 import 'dart:convert';
-import 'package:consulta_cep_flutter/exceptions/cep-nao-encontrado-exception%20copy.dart';
+import '../exceptions/cep-nao-encontrado-exception%20copy.dart';
 
 import '../exceptions/api-invalida-exception.dart';
 import '../exceptions/localizacao-nao-encontrada-exception.dart';

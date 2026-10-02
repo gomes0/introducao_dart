@@ -1,4 +1,5 @@
-import 'package:consulta_cep_flutter/models/endereco.dart';
+import '../models/endereco.dart';
+import '../models/localizacao.dart';
 
 import '../controllers/endereco-controller.dart';
 import 'package:flutter/material.dart';
@@ -7,36 +8,61 @@ class EnderecoView extends StatefulWidget {
   const EnderecoView({super.key});
 
   @override
-  State<StatefulWidget> createState() => _EnderecoViewState();
+  State<EnderecoView> createState() => _EnderecoViewState();
 }
 
 class _EnderecoViewState extends State<EnderecoView> {
   final TextEditingController cepController = TextEditingController();
+
   final EnderecoController enderecoController = EnderecoController();
 
   Endereco? endereco;
+  Localizacao? localizacao;
+
   String? mensagemErro;
+
   bool carregando = false;
+  bool localizacaoIndisponivel = false;
 
   Future<void> consultarCEP() async {
     try {
       setState(() {
         carregando = true;
         mensagemErro = null;
-        this.endereco = null;
+        endereco = null;
+        localizacao = null;
+        localizacaoIndisponivel = false;
       });
 
-      String cep = enderecoController.validaCEP(cepController.text);
+      final String cep =
+          enderecoController.validaCEP(cepController.text);
 
-      final endereco = await enderecoController.buscarEndereco(cep);
+      // Consulta o endereço
+      final Endereco enderecoEncontrado =
+          await enderecoController.buscarEndereco(cep);
 
       setState(() {
-        this.endereco = endereco;
+        endereco = enderecoEncontrado;
       });
+
+      // Consulta a localização separadamente
+      try {
+        final Localizacao localizacaoEncontrada =
+            await enderecoController.buscarLocalizacao(cep);
+
+        setState(() {
+          localizacao = localizacaoEncontrada;
+        });
+      } catch (e) {
+        setState(() {
+          localizacaoIndisponivel = true;
+        });
+      }
     } catch (e) {
       setState(() {
         mensagemErro = e.toString();
         endereco = null;
+        localizacao = null;
       });
     } finally {
       setState(() {
@@ -50,16 +76,17 @@ class _EnderecoViewState extends State<EnderecoView> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('ConsultaCEP'),
-        centerTitle: true, 
-        backgroundColor: Colors.purple.shade900, 
-        foregroundColor: Colors.white, 
-        elevation: 4.0, 
+        centerTitle: true,
+        backgroundColor: Colors.purple.shade900,
+        foregroundColor: Colors.white,
+        elevation: 4.0,
         titleTextStyle: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.1,
         ),
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(16),
 
@@ -70,33 +97,60 @@ class _EnderecoViewState extends State<EnderecoView> {
             TextField(
               controller: cepController,
               keyboardType: TextInputType.number,
+
               decoration: InputDecoration(
                 labelText: 'CEP',
                 hintText: '00000-000',
                 border: const OutlineInputBorder(),
-                // Exibe o ícone de limpar quando o texto não estiver vazio
+
                 suffixIcon: cepController.text.isNotEmpty
                     ? IconButton(
                         icon: const Icon(Icons.clear),
+
                         onPressed: () {
-                          cepController.clear(); // Limpa o texto do campo
+                          cepController.clear();
+
                           setState(() {
-                            endereco =
-                                null; // Opcional: limpa os resultados exibidos na tela
+                            endereco = null;
+                            localizacao = null;
                             mensagemErro = null;
+                            localizacaoIndisponivel = false;
                           });
                         },
                       )
                     : null,
               ),
+
+              onChanged: (_) {
+                setState(() {});
+              },
             ),
 
             const SizedBox(height: 16),
 
             ElevatedButton(
-              onPressed: consultarCEP,
+              onPressed: carregando ? null : consultarCEP,
               child: const Text('Consultar'),
             ),
+
+            if (carregando) ...[
+              const SizedBox(height: 24),
+
+              const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ],
+
+            if (mensagemErro != null) ...[
+              const SizedBox(height: 16),
+
+              Text(
+                mensagemErro!,
+                style: const TextStyle(
+                  color: Colors.red,
+                ),
+              ),
+            ],
 
             if (endereco != null) ...[
               const SizedBox(height: 24),
@@ -104,16 +158,20 @@ class _EnderecoViewState extends State<EnderecoView> {
               Container(
                 padding: const EdgeInsets.all(16.0),
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
+
                 decoration: BoxDecoration(
-                  color: Colors.grey[20],
+                  color: Colors.grey[100],
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.grey.shade200),
+                  border: Border.all(
+                    color: Colors.grey.shade200,
+                  ),
                 ),
+
                 child: Column(
-                  crossAxisAlignment:
-                      CrossAxisAlignment.start, // Alinha o texto à esquerda
-                  mainAxisSize:
-                      MainAxisSize.min, // Ocupa apenas o espaço necessário
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                  mainAxisSize: MainAxisSize.min,
+
                   children: [
                     Text(
                       'Logradouro: ${endereco!.logradouro}',
@@ -122,27 +180,78 @@ class _EnderecoViewState extends State<EnderecoView> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(height: 4.0), // Espaço entre as linhas
-                    Text('Bairro: ${endereco!.bairro}'),
-                    const SizedBox(height: 4.0),
-                    Text('Cidade: ${endereco!.localidade}'),
-                    const SizedBox(height: 4.0),
-                    Text('UF: ${endereco!.uf}'),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      'Bairro: ${endereco!.bairro}',
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      'Cidade: ${endereco!.localidade}',
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      'UF: ${endereco!.uf}',
+                    ),
                   ],
                 ),
               ),
             ],
 
-            if (mensagemErro != null) ...[
+            if (localizacao != null) ...[
               const SizedBox(height: 16),
 
-              Text(mensagemErro!, style: const TextStyle(color: Colors.red)),
+              Container(
+                padding: const EdgeInsets.all(16),
+
+                decoration: BoxDecoration(
+                  color: Colors.blueGrey.shade50,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: Colors.grey.shade200,
+                  ),
+                ),
+
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+
+                  children: [
+                    const Text(
+                      'Localização',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+
+                    const SizedBox(height: 8),
+
+                    Text(
+                      'Latitude: ${localizacao!.latitude}',
+                    ),
+
+                    Text(
+                      'Longitude: ${localizacao!.longitude}',
+                    ),
+                  ],
+                ),
+              ),
             ],
 
-            if (carregando) ...[
-              SizedBox(height: 24),
+            if (localizacaoIndisponivel) ...[
+              const SizedBox(height: 16),
 
-              const Center(child: CircularProgressIndicator()),
+              const Text(
+                'Localização não disponível para este CEP.',
+                style: TextStyle(
+                  color: Colors.orange,
+                ),
+              ),
             ],
           ],
         ),
